@@ -10,19 +10,20 @@ import jwt
 user = APIRouter()
 
 
-@user.get("/{user_id}", tags=["users"])
+@user.get("/{user_id}", tags=["Users"])
 def get_user(user_id: str):
     _id = ObjectId(user_id)
     user = db.user.find_one({"_id": _id})
     return userEntity(user)
 
 
-@user.post("/", tags=["users"])
+@user.post("/", tags=["Users"])
 def create_user(user: UserIn):
     if db.user.find_one(dict(user)):
         return JSONResponse({"message": "User is already in database"},
         status_code=400)
     new_user = User.parse_obj(user)
+    
     new_user.salt = bcrypt.gensalt()
     salt = new_user.salt
     password = new_user.password.encode("utf-8")  # *Encoded to the binary data
@@ -31,7 +32,7 @@ def create_user(user: UserIn):
     return JSONResponse({"message": "User has been created"}, status_code=201)
 
 
-@user.post("/login", tags=["users"])
+@user.post("/login", tags=["Users"])
 def login_user(user: UserIn):
     log_user = db.user.find_one({"email": user.email})
     password = user.password.encode("utf-8")
@@ -46,6 +47,6 @@ def login_user(user: UserIn):
     return JSONResponse({"message": "Invalid arguments"}, 400)
 
 
-@user.put("/", tags=["users"])
+@user.put("/", tags=["Users"])
 def update_user(user: UserIn):
     pass

@@ -42,8 +42,7 @@ def login_user(user: UserIn):
         payload = {"user_id": str(log_user["_id"])}
         token = jwt.encode(payload=payload,key="SECRET_KEY")
         return JSONResponse(
-            {"message": "User logged in", "token": token}, status_code=200
-        )
+            {"message": "User logged in", "token": token}, status_code=200)
     return JSONResponse({"message": "Invalid arguments"}, 400)
 
 

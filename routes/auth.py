@@ -1,9 +1,9 @@
-from fastapi import APIRouter
-from fastapi.responses import JSONResponse
+from datetime import datetime, timedelta
 import bcrypt
 import jwt
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 from models.user import UserIn, User, check_password
-from models.token import Token
 from config.db import db
 
 auth = APIRouter()
@@ -18,24 +18,28 @@ def register(user: UserIn) -> JSONResponse:
     new_user = User.parse_obj(user) #* Takes all the fields from the json body
     new_user.salt = salt
     db.user.insert_one(new_user.dict())
-    return JSONResponse({"message":"User successfully registered"},
-    200)
+    return JSONResponse({"message":"User successfully registered"}, 200)
 
 
 @auth.post('/auth/login', tags=['Auth'])
-def login(user_input: UserIn):
-    user = db.user.find_one({"email":user_input.email})
-    if user:
+def login(user_input: UserIn) -> JSONResponse:
+    if user := db.user.find_one({"email":user_input.email}):
         if check_password(user_input.password,user['salt'],user['password']):
-            token = jwt.encode({"obj_id":str(user['_id'])},'secret_key')
+            _id = str(user['_id'])
+            expiration_time = datetime.utcnow() + timedelta(days=2)
+            token = jwt.encode(
+                {
+                "_id":_id,
+                "exp":expiration_time,
+                }, 'secret_key')
             return JSONResponse({"access_token":token,"message":"Success!"}, 200)
         return JSONResponse({"message":"Incorrect password"}, 400)
     return JSONResponse({"message":"User is not registered"}, 400)
 
 
-@auth.post('/auth/logout/', tags=['Auth'])
-def logout(token: Token):
-    if db.token_blacklist.find_one({"token":str(token)}):
+@auth.post('/auth/logout/{token}', tags=['Auth'])
+def logout(token: str) -> JSONResponse:
+    if db.token_blacklist.find_one({"token":token}):
         return JSONResponse({"message":"Token is already in the database"}, 400)
-    db.token_blacklist.insert_one({"token":str(token)})
+    db.token_blacklist.insert_one({"token":token})
     return JSONResponse({"message":"Logout successful"}, 200)

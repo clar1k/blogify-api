@@ -1,5 +1,10 @@
 from pydantic import BaseModel
 
 class Post(BaseModel):
-    user_id: str
+    author_id: str = ''
+    text: str
+    likes: int = 0
+
+class PostIn(BaseModel):
+    token: str
     text: str

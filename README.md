@@ -1,7 +1,7 @@
 # Blogify - RESTful API 😎
 # Main Features
 - Create a user, login and receive JWT token, update user info.
-- Create posts, update posts, get posts by user id.
+- Create posts, update posts, get posts by user id, delete posts.
 
 # Tech Stack
 - FastAPI ⚡
@@ -20,12 +20,13 @@
 - Run the command in terminal.
 
         git clone https://github.com/clar1k/BlogifyAPI
-- When write in command line:
+
+- Go to the new directory. When write in command line:
 
         py -m venv .venv
 
-- Activate virtual environment
+- Activate virtual environment.
 
         pip install -r requirements.txt
-        python app.py
-        Go to the app.route '/' in your browser
+        python main.py
+- Go to the **http://127.0.0.1:8000/docs** in your browser to see documentation and all the endpoints for the API

@@ -1,7 +1,6 @@
-from pydantic import BaseModel, Field, EmailStr
-import bcrypt
 import datetime
-
+import bcrypt
+from pydantic import BaseModel, EmailStr
 
 class User(BaseModel):
     nickname: str
@@ -9,6 +8,7 @@ class User(BaseModel):
     password: bytes
     salt: bytes = b''
     is_confirm: bool = False
+    confirm_token: str = ''
     created_at: datetime.datetime = datetime.datetime.now()
 
 

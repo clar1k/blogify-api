@@ -32,8 +32,14 @@ def create_post(post: PostIn) -> JSONResponse:
     db.posts.insert_one(new_post.dict())
     return JSONResponse({"message":"Post succesfulyy created"}, 201)
 
+
 @posts.delete('/post/{post_id}', tags=['Posts'])
 def delete_post_by_id(post_id: str) -> JSONResponse:
     if db.posts.find_one_and_delete({"_id":ObjectId(post_id)}):
         return JSONResponse({"message":"Post was deleted"}, 200)
     return JSONResponse({"message":"Post not found"}, 400)
+
+
+@posts.put('/post')
+def update_post() -> JSONResponse:
+    return

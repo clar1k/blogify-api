@@ -1,5 +1,5 @@
 # Blogify - RESTful API 😎
-# Main Features
+## Main Features
 - Register a user, add a profile picture, login and receive JWT, update user info.
 - Create posts, update posts, get posts by user id, delete posts.
 
@@ -32,4 +32,4 @@
 
 - ### Go to the **http://127.0.0.1:8000/docs** in your browser to see documentation and all the endpoints for the API
 
-## If you liked the project you could support me here <a src="https://www.buymeacoffee.com/clar1k">BuyMeACoffee☕</a>
+## If you liked the project you could support me here <a href="https://www.buymeacoffee.com/clar1k">BuyMeACoffee</a>☕

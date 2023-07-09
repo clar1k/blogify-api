@@ -1,11 +1,11 @@
+import bcrypt
+from bson import ObjectId
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from models.user import UserIn, User
 from config.db import db
+
 from schemas.user import userEntity
-from bson import ObjectId
-import bcrypt
-import jwt
 
 user = APIRouter()
 
@@ -32,20 +32,11 @@ def create_user(user: UserIn):
     return JSONResponse({"message": "User has been created"}, status_code=201)
 
 
-@user.post("/login", tags=["Users"])
-def login_user(user: UserIn):
-    log_user = db.user.find_one({"email": user.email})
-    password = user.password.encode("utf-8")
-
-    passw = bcrypt.hashpw(password, log_user["salt"])
-    if passw == log_user["password"]:
-        payload = {"user_id": str(log_user["_id"])}
-        token = jwt.encode(payload=payload,key="SECRET_KEY")
-        return JSONResponse(
-            {"message": "User logged in", "token": token}, status_code=200)
-    return JSONResponse({"message": "Invalid arguments"}, 400)
-
-
 @user.put("/", tags=["Users"])
 def update_user(user: UserIn):
     pass
+
+
+@user.delete("/", tags=["Users"])
+def delete_user():
+    return

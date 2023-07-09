@@ -6,9 +6,10 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from fastapi import UploadFile, File
-from models.user import UserIn, User, check_password
+from models.user import UserIn, User, check_password 
 from config.db import db
 from config.mail import send_message, generate_confirm_token, get_email_by_token
+from config.config import Config
 
 auth = APIRouter()
 
@@ -38,7 +39,7 @@ def login(user_input: UserIn) -> JSONResponse:
                 {
                 "_id":_id,
                 "exp":expiration_time,
-                }, 'secret_key')
+                }, Config.SECRET_KEY)
             return JSONResponse({"access_token":token,"message":"Success!"}, 200)
         return JSONResponse({"message":"Incorrect password"}, 400)
     return JSONResponse({"message":"User is not registered"}, 400)
@@ -64,5 +65,6 @@ def confirm_email(token: str):
 async def upload_avatar(file: UploadFile = File(...)):
     bytes_img = io.BytesIO(await file.read())
     img = Image.open(bytes_img)
-    img.save(f'uploads/{file.filename}', 'JPEG')
+    upload_path = Config.UPLOAD_FOLDER + file.filename
+    img.save(upload_path, 'JPEG')
     return JSONResponse({"message":"Success"}, 201)

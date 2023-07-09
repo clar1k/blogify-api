@@ -40,6 +40,6 @@ def delete_post_by_id(post_id: str) -> JSONResponse:
     return JSONResponse({"message":"Post not found"}, 400)
 
 
-@posts.put('/post')
+@posts.put('/post', tags=['Posts'])
 def update_post() -> JSONResponse:
     return

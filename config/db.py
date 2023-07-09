@@ -1,4 +1,7 @@
+from os import environ as env
 from pymongo import MongoClient
+from dotenv import load_dotenv
 
-conn = MongoClient("mongodb://localhost:27017")
+load_dotenv('.env')
+conn = MongoClient(env.get('MONGO_CONNECTION'))
 db = conn['blogify']

@@ -1,6 +1,6 @@
 # Blogify - RESTful API 😎
 ## Main Features
-- Register a user, add a profile picture, login and receive JWT, update user info.
+- Register a user, add a profile picture, login and receive JWT, update user info, delete user, update data for user.
 - Create posts, update posts, get posts by user id, delete posts.
 
 # Tech Stack
@@ -8,7 +8,7 @@
 
 - MongoDB 🍃
 
-- JWT Token 🕸️
+- JWT 🕸️
 
 <img src="https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"  height="250"></img>
 

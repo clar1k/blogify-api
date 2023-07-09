@@ -1,10 +1,14 @@
-from datetime import datetime, timedelta
+import io
 import bcrypt
 import jwt
+from PIL import Image
+from datetime import datetime, timedelta
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
+from fastapi import UploadFile, File
 from models.user import UserIn, User, check_password
 from config.db import db
+from config.mail import send_message, generate_confirm_token, get_email_by_token
 
 auth = APIRouter()
 
@@ -17,8 +21,11 @@ def register(user: UserIn) -> JSONResponse:
     user.password = bcrypt.hashpw(user.password.encode(),salt=salt)
     new_user = User.parse_obj(user) #* Takes all the fields from the json body
     new_user.salt = salt
+    token = generate_confirm_token(new_user.email)
+    new_user.confirm_token = token
+    send_message(new_user.email, token)
     db.user.insert_one(new_user.dict())
-    return JSONResponse({"message":"User successfully registered"}, 200)
+    return JSONResponse({"message":"User successfully registered, confirm your email!"}, 200)
 
 
 @auth.post('/auth/login', tags=['Auth'])
@@ -43,3 +50,19 @@ def logout(token: str) -> JSONResponse:
         return JSONResponse({"message":"Token is already in the database"}, 400)
     db.token_blacklist.insert_one({"token":token})
     return JSONResponse({"message":"Logout successful"}, 200)
+
+
+@auth.put('/confirm/{token}', tags=['Auth'])
+def confirm_email(token: str):
+    email = get_email_by_token(token)
+    if db.user.find_one_and_update({"email":email},{"$set":{"is_confirm":True}},return_document=True):
+        return JSONResponse({"message":"User activated the account"}, 200)
+    return JSONResponse({"message":"Invalid request"}, 400)
+
+
+@auth.put('/auth/register', tags=['Auth'])
+async def upload_avatar(file: UploadFile = File(...)):
+    bytes_img = io.BytesIO(await file.read())
+    img = Image.open(bytes_img)
+    img.save(f'uploads/{file.filename}', 'JPEG')
+    return JSONResponse({"message":"Success"}, 201)

@@ -6,20 +6,20 @@ from fastapi.responses import JSONResponse
 from fastapi import Body
 from models.user import UserIn, User, UserUpdate
 from config.db import db
-from schemas.user import userEntity
 from config.config import Config
+from schemas.user import userEntity
 
-user = APIRouter()
+user = APIRouter(tags=['Users'])
 
 
-@user.get("/{user_id}", tags=["Users"])
+@user.get("/{user_id}")
 def get_user(user_id: str):
     _id = ObjectId(user_id)
     user = db.user.find_one({"_id": _id})
     return userEntity(user)
 
 
-@user.post("/", tags=["Users"])
+@user.post("/")
 def create_user(user: UserIn):
     if db.user.find_one(dict(user)):
         return JSONResponse({"message": "User is already in database"},
@@ -33,14 +33,14 @@ def create_user(user: UserIn):
     return JSONResponse({"message": "User has been created"}, status_code=201)
 
 
-@user.put("/", tags=["Users"])
+@user.put("/")
 def update_user(user: UserUpdate):
     if db.user.find_one_and_replace({"email": user.email}, user.dict()):
         return JSONResponse({"message":"Update successfull :D"}, 201)
     return JSONResponse({"message":"Invalid value :( "}, 400)
 
 
-@user.delete("/", tags=["Users"])
+@user.delete("/")
 async def delete_user(token: dict = Body(..., example={"token":"access token value"})):
     decoded_token = jwt.decode(token['token'], Config.SECRET_KEY, ['HS256'])
     _id = ObjectId(decoded_token['_id'])

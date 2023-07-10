@@ -1,7 +1,12 @@
 # Blogify - RESTful API 😎
 ## Main Features
 - Register a user, add a profile picture, login and receive JWT, update user info, delete user, update data for user.
+
 - Create posts, update posts, get posts by user id, delete posts.
+
+- Create comments, update comments, delete comments, get comments on the specific post.
+
+- Like posts, unlike posts, get user liked posts.
 
 # Tech Stack
 - FastAPI ⚡
@@ -17,6 +22,7 @@
 <img src="https://w7.pngwing.com/pngs/413/267/png-transparent-jwt-io-json-web-token-hd-logo.png" width="" height="300"></img>
 
 # How to run the app
+### You need installed MongoDB, Python(3.11.3) version to run this. 🙌
 - ### Run the command in your terminal.
 
         git clone https://github.com/clar1k/BlogifyAPI

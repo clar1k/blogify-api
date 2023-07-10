@@ -6,24 +6,24 @@ from models.posts import PostIn, Post
 from config.db import db
 from schemas.posts import postEntity, postsEntity
 
-posts = APIRouter()
+posts = APIRouter(tags=['Posts'])
 
 
-@posts.get('/post/user/{user_id}', tags=['Posts'])
+@posts.get('/post/user/{user_id}')
 def get_post_by_user(user_id: str) -> JSONResponse:
     if posts := db.posts.find({"author_id":user_id}):
         return JSONResponse(postsEntity(posts), 200)
     return JSONResponse({"message":"Posts not found"},400)
 
 
-@posts.get('/post/{post_id}', tags=['Posts'])
+@posts.get('/post/{post_id}')
 def get_post_by_id(post_id: str):
     if post := db.posts.find_one({"_id":ObjectId(post_id)}):
         return JSONResponse(postEntity(post), 200)
     return JSONResponse({"message":"There`s no post by this id"}, 400)
 
 
-@posts.post('/post/', tags=['Posts'])
+@posts.post('/post/')
 def create_post(post: PostIn) -> JSONResponse:
     token_decode = jwt.decode(post.token.encode('utf-8'),'secret_key', algorithms=['HS256'])
     _id = token_decode['_id']
@@ -33,13 +33,13 @@ def create_post(post: PostIn) -> JSONResponse:
     return JSONResponse({"message":"Post succesfulyy created"}, 201)
 
 
-@posts.delete('/post/{post_id}', tags=['Posts'])
+@posts.delete('/post/{post_id}')
 def delete_post_by_id(post_id: str) -> JSONResponse:
     if db.posts.find_one_and_delete({"_id":ObjectId(post_id)}):
         return JSONResponse({"message":"Post was deleted"}, 200)
     return JSONResponse({"message":"Post not found"}, 400)
 
 
-@posts.put('/post', tags=['Posts'])
+@posts.put('/post')
 def update_post() -> JSONResponse:
     return

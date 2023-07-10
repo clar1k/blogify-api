@@ -1,8 +1,8 @@
 import io
+from datetime import datetime, timedelta
 import bcrypt
 import jwt
 from PIL import Image
-from datetime import datetime, timedelta
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from fastapi import UploadFile, File
@@ -11,10 +11,10 @@ from config.db import db
 from config.mail import send_message, generate_confirm_token, get_email_by_token
 from config.config import Config
 
-auth = APIRouter()
+auth = APIRouter(tags=['Auth'])
 
 
-@auth.post('/auth/register', tags=['Auth'])
+@auth.post('/auth/register')
 def register(user: UserIn) -> JSONResponse:
     if db.user.find_one({"email":user.email}):
         return JSONResponse({"message":"User is already in the database"}, 400)
@@ -29,7 +29,7 @@ def register(user: UserIn) -> JSONResponse:
     return JSONResponse({"message":"User successfully registered, confirm your email!"}, 200)
 
 
-@auth.post('/auth/login', tags=['Auth'])
+@auth.post('/auth/login')
 def login(user_input: UserIn) -> JSONResponse:
     if user := db.user.find_one({"email":user_input.email}):
         if check_password(user_input.password,user['salt'],user['password']):
@@ -45,7 +45,7 @@ def login(user_input: UserIn) -> JSONResponse:
     return JSONResponse({"message":"User is not registered"}, 400)
 
 
-@auth.post('/auth/logout/{token}', tags=['Auth'])
+@auth.post('/auth/logout/{token}')
 def logout(token: str) -> JSONResponse:
     if db.token_blacklist.find_one({"token":token}):
         return JSONResponse({"message":"Token is already in the database"}, 400)
@@ -53,7 +53,7 @@ def logout(token: str) -> JSONResponse:
     return JSONResponse({"message":"Logout successful"}, 200)
 
 
-@auth.put('/confirm/{token}', tags=['Auth'])
+@auth.put('/confirm/{token}')
 def confirm_email(token: str):
     email = get_email_by_token(token)
     if db.user.find_one_and_update({"email":email},{"$set":{"is_confirm":True}},return_document=True):
@@ -61,7 +61,7 @@ def confirm_email(token: str):
     return JSONResponse({"message":"Invalid request"}, 400)
 
 
-@auth.put('/auth/register', tags=['Auth'])
+@auth.put('/auth/register')
 async def upload_avatar(file: UploadFile = File(...)):
     bytes_img = io.BytesIO(await file.read())
     img = Image.open(bytes_img)

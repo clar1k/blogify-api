@@ -1,7 +1,9 @@
 import datetime
 import bcrypt
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from models.PyObjectId import PyObjectId
+from typing import List, Optional
+
 
 class User(BaseModel):
     nickname: str
@@ -11,7 +13,9 @@ class User(BaseModel):
     is_confirm: bool = False
     confirm_token: str = ''
     image_filename: str = ''
-    created_at: datetime.datetime = datetime.datetime.now()
+    followers: List[PyObjectId] = []
+    created_at: datetime.datetime = datetime.datetime.utcnow()
+
 
 
 class UserIn(BaseModel):
@@ -29,7 +33,8 @@ class UserUpdate(BaseModel):
     nickname: Optional[str] = None
     email: EmailStr
     password: Optional[str] = None
-    
+
+
 def check_password(password: str, salt: bytes, hashed_pw: bytes) -> bool:
     hashed_input = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed_input == hashed_pw

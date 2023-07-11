@@ -1,9 +1,10 @@
 import io
+import asyncio
 from datetime import datetime, timedelta
 import bcrypt
 import jwt
 from PIL import Image
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi import UploadFile, File
 from models.user import UserIn, User, check_password 
@@ -15,18 +16,24 @@ auth = APIRouter(tags=['Auth'])
 
 
 @auth.post('/auth/register')
-def register(user: UserIn) -> JSONResponse:
+async def register(user: UserIn, background_tasks: BackgroundTasks) -> JSONResponse:
     if db.user.find_one({"email":user.email}):
         return JSONResponse({"message":"User is already in the database"}, 400)
+    background_tasks.add_task(handle_user_input, user)
+    return JSONResponse({"message":"User successfully registered, confirm your email!"}, 201)
+
+
+async def handle_user_input(user: UserIn):
     salt: bytes = bcrypt.gensalt()
-    user.password = bcrypt.hashpw(user.password.encode(),salt=salt)
-    new_user = User.parse_obj(user) #* Takes all the fields from the json body
+    user.password: bytes = bcrypt.hashpw(user.password.encode(),salt=salt)
+    new_user = User.parse_obj(user)
     new_user.salt = salt
+    
     token = generate_confirm_token(new_user.email)
     new_user.confirm_token = token
     send_message(new_user.email, token)
     db.user.insert_one(new_user.dict())
-    return JSONResponse({"message":"User successfully registered, confirm your email!"}, 200)
+    print(datetime.utcnow())
 
 
 @auth.post('/auth/login')

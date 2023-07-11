@@ -1,7 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel
+from models.PyObjectId import PyObjectId
 class Post(BaseModel):
-    author_id: str = ''
+    author_id: PyObjectId
     title: str
     text: str
     likes: int = 0

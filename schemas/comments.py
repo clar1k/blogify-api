@@ -1,8 +1,6 @@
-def commentEntity(comm: dict) -> dict:
-    return {
-        "content":comm["content"]
-    }
+def commentEntity(comment: dict) -> dict:
+    return {"content": comment["content"]}
 
 
-def commentsEntity(comms: list) -> list:
-    return [commentEntity(comm) for comm in comms]
+def commentsEntity(comments: list) -> list:
+    return [commentEntity(comment) for comment in comments]

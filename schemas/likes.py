@@ -1,7 +1,5 @@
 def likeEntity(like: dict) -> dict:
-    return {
-        "post_id":like['post_id']
-    }
+    return {"post_id": like["post_id"]}
 
 
 def likesEntity(likes: list) -> list:

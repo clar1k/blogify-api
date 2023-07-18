@@ -4,10 +4,11 @@
 
 - Create posts, update posts, get posts by user id, delete posts.
 
-- Create comments, update comments, delete comments, get comments on the specific post.
+- Create comments, update comments, delete comments, get comments on the post.
 
 - Like posts, unlike posts, get user liked posts.
 
+- Follow user, unfollow
 # Tech Stack
 - FastAPI ⚡
 

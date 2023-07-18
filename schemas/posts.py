@@ -1,8 +1,8 @@
 def postEntity(post: dict) -> dict:
     return {
-        "title":post['title'],
-        "text": post['text'],
-        "author_id": post['author_id']
+        "title": post["title"],
+        "text": post["text"],
+        "author_id": post["author_id"],
     }
 
 

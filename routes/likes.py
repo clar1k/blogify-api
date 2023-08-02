@@ -12,18 +12,16 @@ likes = APIRouter(tags=["Likes"])
 
 @likes.post("/like/post")
 def like_post(like: Like):
-    if db.likes.find_one({"post_id": like.post_id, "user_id": like.user_id}):
-        db.likes.find_one_and_delete(like.dict())
+    find_like_query = {"post_id": like.post_id}
+    if db.likes.find_one(find_like_query, {"user_id": like.user_id}):
+        decrement_like = {"$inc": {"likes": -1}}
         db.posts.find_one_and_update(
-            {"_id": ObjectId(like.post_id)}, {"$inc": {"likes": -1}}
-        )
-        return JSONResponse({"message": "Unliked"}, 200)
-
+            {"_id": ObjectId(like.post_id)}, decrement_like)
+        return JSONResponse({"message": "Unliked post"}, 200)
     db.likes.insert_one(like.dict())
-    db.posts.find_one_and_update(
-        {"_id": ObjectId(like.post_id)}, {"$inc": {"likes": 1}}
-    )
-    return JSONResponse({"message": "Liked"}, 201)
+    increment_like = {"$inc": {"likes": 1} }
+    db.posts.find_one_and_update(find_like_query, increment_like)
+    return JSONResponse({"message": "Liked post"}, 201)
 
 
 @likes.get("/like/user/posts/{token}")

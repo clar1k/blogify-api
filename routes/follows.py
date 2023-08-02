@@ -10,28 +10,28 @@ follows = APIRouter(tags=["Follows"])
 
 @follows.post("/follow/user")
 def follow(follow: Follow) -> JSONResponse:
-    uid = get_id(follow.token)
-    if db.user.find_one({"_id": uid}):
+    unique_id = get_id(follow.token)
+    if db.user.find_one({"_id": unique_id}):
 
         if db.user.find_one_and_update(
-            {"followers": {"$in": [uid]}}, {"$unset": {"followers": uid}}
+            {"followers": {"$in": [unique_id]}}, {"$unset": {"followers": unique_id}}
         ):
             return JSONResponse({"message": "Unfollowed"}, 400)
 
         if db.user.find_one_and_update(
-            {"_id": follow.author_id},
-            {
-                "$push": {
-                    "followers": uid,
-                }
+                {"_id": follow.author_id},
+                {
+                    "$push": {
+                        "followers": unique_id,
+                    }
             },
         ):
             return JSONResponse({"message": "Followed"}, 200)
     return JSONResponse({"message": "User not found"}, 400)
 
 
-@follows.get("/follow/user/{uid}")
-def get_user_followers(uid: str) -> JSONResponse:
-    if user := db.user.find_one({"_id": ObjectId(uid)}):
+@follows.get("/follow/user/{unique_id}")
+def get_user_followers(unique_id: str) -> JSONResponse:
+    if user := db.user.find_one({"_id": ObjectId(unique_id)}):
         return JSONResponse({"followers": str(list(user["followers"]))}, 200)
     return JSONResponse({"message": "User is not registered"}, 400)

@@ -1,5 +1,6 @@
 import io
 from datetime import datetime, timedelta
+from typing import Dict
 import bcrypt
 import jwt
 from PIL import Image
@@ -20,14 +21,16 @@ async def register(user: UserIn, tasks: BackgroundTasks):
     if user_is_existed:
         return JSONResponse({"message": "User is already in database"}, 400)
     tasks.add_task(handle_register, user)
-    return JSONResponse({"message": "User successfully registered, confirm your email!"}, 201)
+    return JSONResponse(
+        {"message": "User successfully registered, confirm your email!"}, 201
+    )
 
 
 async def handle_register(user: UserIn):
     salt: bytes = bcrypt.gensalt()
     user.password: bytes = bcrypt.hashpw(user.password.encode(), salt=salt)
-    new_user = User.parse_obj(user)
-    new_user.salt = salt
+    new_user: User = User.parse_obj(user)
+    new_user.salt: bytes = salt
 
     token = generate_confirm_token(new_user.email)
     new_user.confirm_token = token
@@ -36,20 +39,30 @@ async def handle_register(user: UserIn):
 
 
 @auth.post("/auth/login")
-def login(user_input: UserIn) :
-    user = db.user.find_one({"email": user_input.email})
-    if user and user["is_confirm"]:
+async def login(user_input: UserIn) -> JSONResponse:
+    login_user(user_input)
+
+
+def login_user(user_input: UserIn) -> JSONResponse:
+    user: Dict = db.user.find_one({"email": user_input.email})
+    user_confirmed_his_email: bool = user["is_confirm"]
+    if user and user_confirmed_his_email:
         if check_password(user_input.password, user["salt"], user["password"]):
-            _id = str(user["_id"])
-            expiration_time = datetime.utcnow() + timedelta(days=2)
-            token = jwt.encode({"_id": _id, "exp": expiration_time}, Config.SECRET_KEY)
-            return JSONResponse({"jwt": token, "message": "Success!"}, 200)
+            unique_id = str(user["_id"])
+            token = create_token(unique_id)
+            return JSONResponse({"accessToken": token, "message": "Success!"}, 200)
         return JSONResponse({"message": "Incorrect password"}, 400)
-    return JSONResponse({"message": "User is not registered"}, 400)
+    return JSONResponse({"message": "User not found"}, 400)
+
+
+async def create_token(unique_id: str) -> str:
+    expiration_time = datetime.utcnow() + timedelta(days=2)
+    token = jwt.encode({"_id": unique_id, "exp": expiration_time}, Config.SECRET_KEY)
+    return token
 
 
 @auth.post("/auth/logout/{token}")
-def logout(token: str) :
+async def logout(token: str) -> JSONResponse:
     if db.token_blacklist.find_one({"token": token}):
         return JSONResponse({"message": "Token is already in the database"}, 400)
     db.token_blacklist.insert_one({"token": token})
@@ -57,7 +70,7 @@ def logout(token: str) :
 
 
 @auth.put("/confirm/{token}")
-def confirm_email(token: str):
+async def confirm_email(token: str) -> JSONResponse:
     email = get_email_by_token(token)
     _filter = {"email": email}
     update_filter = {"$set": {"is_confirm": True}}
@@ -67,7 +80,7 @@ def confirm_email(token: str):
 
 
 @auth.put("/auth/register")
-async def upload_avatar(file: UploadFile = File(...)):
+async def upload_avatar(file: UploadFile = File(...)) -> JSONResponse:
     bytes_img = io.BytesIO(await file.read())
     img = Image.open(bytes_img)
     upload_path = Config.UPLOAD_FOLDER + file.filename

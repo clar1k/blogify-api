@@ -28,6 +28,6 @@ class UserOut(BaseModel):
     email: EmailStr
 
 
-def check_password(password: str, salt: bytes, hashed_pw: bytes) -> bool:
+def check_password(password: str, salt: bytes, hashed_password: bytes) -> bool:
     hashed_input = bcrypt.hashpw(password.encode("utf-8"), salt)
-    return hashed_input == hashed_pw
+    return hashed_input == hashed_password

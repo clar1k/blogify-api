@@ -19,11 +19,11 @@ def follow(follow: Follow) -> JSONResponse:
             return JSONResponse({"message": "Unfollowed"}, 400)
 
         if db.user.find_one_and_update(
-                {"_id": follow.author_id},
-                {
-                    "$push": {
-                        "followers": unique_id,
-                    }
+            {"_id": follow.author_id},
+            {
+                "$push": {
+                    "followers": unique_id,
+                }
             },
         ):
             return JSONResponse({"message": "Followed"}, 200)

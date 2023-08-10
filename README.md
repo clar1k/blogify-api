@@ -8,13 +8,15 @@
 
 - Like posts, unlike posts, get user liked posts.
 
-- Follow user, unfollow
+- Follow user, unfollow.
 # Tech Stack
-- FastAPI ⚡
+- **FastAPI** ⚡
 
-- MongoDB 🍃
+- **MongoDB** 🍃
 
-- JWT 🕸️
+- **JWT** 🕸️
+
+- **GraphQL** <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/GraphQL_Logo.svg/2048px-GraphQL_Logo.svg.png" height=16>
 
 <img src="https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"  height="250"></img>
 

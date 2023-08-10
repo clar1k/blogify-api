@@ -11,9 +11,9 @@ posts = APIRouter(tags=["Posts"])
 
 @posts.get("/posts/user/")
 def get_post_by_user(nickname: str) -> JSONResponse:
-    _filter = {"nickname":nickname}
+    _filter = {"nickname": nickname}
     user = db.user.find_one(_filter)
-    if posts := db.posts.find({"author_id": user['_id']}):
+    if posts := db.posts.find({"author_id": user["_id"]}):
         return JSONResponse(postsEntity(posts), 200)
     return JSONResponse({"message": "User has no posts"}, 400)
 
@@ -42,7 +42,7 @@ async def delete_post_by_title_and_text(post: PostIn) -> JSONResponse:
     is_post_deleted = db.posts.find_one_and_delete(post_filter)
     if is_post_deleted:
         return JSONResponse({"message": "Post deleted"}, 200)
-    
+
     return JSONResponse({"message": "Post not found"}, 400)
 
 

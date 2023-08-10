@@ -15,11 +15,10 @@ def like_post(like: Like):
     find_like_query = {"post_id": like.post_id}
     if db.likes.find_one(find_like_query, {"user_id": like.user_id}):
         decrement_like = {"$inc": {"likes": -1}}
-        db.posts.find_one_and_update(
-            {"_id": ObjectId(like.post_id)}, decrement_like)
+        db.posts.find_one_and_update({"_id": ObjectId(like.post_id)}, decrement_like)
         return JSONResponse({"message": "Unliked post"}, 200)
     db.likes.insert_one(like.dict())
-    increment_like = {"$inc": {"likes": 1} }
+    increment_like = {"$inc": {"likes": 1}}
     db.posts.find_one_and_update(find_like_query, increment_like)
     return JSONResponse({"message": "Liked post"}, 201)
 

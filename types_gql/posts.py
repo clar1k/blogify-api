@@ -7,3 +7,9 @@ class PostType:
     title: strawberry.auto
     text: strawberry.auto
     likes: strawberry.auto
+
+
+@strawberry.experimental.pydantic.input(model=Post)
+class PostInputType:
+    title: strawberry.auto
+    text: strawberry.auto

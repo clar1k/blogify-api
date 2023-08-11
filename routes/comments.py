@@ -22,9 +22,9 @@ def post_comment(comment: CommentIn) -> JSONResponse:
 
 
 @comments.get("/comments/post/{_id}")
-def get_comments(_id: str) -> JSONResponse:
-    if db.posts.find({"_id": ObjectId(_id)}):
-        comments = db.comments.find({"post_id": _id})
+def get_comments(unique_id: str) -> JSONResponse:
+    if db.posts.find({"_id": ObjectId(unique_id)}):
+        comments = db.comments.find({"post_id": unique_id})
         return JSONResponse(commentsEntity(comments), 200)
     return JSONResponse({"message": "Bad request"}, 400)
 

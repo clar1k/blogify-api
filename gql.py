@@ -1,14 +1,17 @@
+from pprint import pprint
 from typing import Dict, List
 from bson import ObjectId
 import strawberry
 from strawberry.fastapi import GraphQLRouter
-from types_gql.posts import PostType
+from types_gql.posts import PostType, PostInputType
 from types_gql.users import UserInType, UserType
 from models.users import User
 from models.posts import Post
 from config.db import db
 from routes.auth import handle_register
-from pprint import pprint
+from types_gql.comments import CommentType
+from schemas.comments import commentsEntity
+from models.comments import Comment
 
 
 @strawberry.type
@@ -33,6 +36,21 @@ class Query:
             post_types.append(PostType.from_pydantic(post))
         if post_types:
             return post_types
+
+    @strawberry.field
+    def get_comments_on_the_post(post: PostInputType) -> List[CommentType]:
+        post_pydantic = post.to_pydantic()
+        find_post_filter = {"title": post_pydantic.title, "text": post_pydantic.text}
+        find_post = db.posts.find_one(find_post_filter)
+        find_post = dict(find_post)
+        find_comments_filter = {"post_id": str(find_post["_id"])}
+        comments = db.comments.find(find_comments_filter)
+        comments = commentsEntity(comments)
+        comment_types = []
+        for comment in comments:
+            comment = Comment.parse_obj(comment)
+            comment_types.append(CommentType.from_pydantic(comment))
+        return comment_types
 
 
 def find_user_posts_by_nickname(nickname: str):

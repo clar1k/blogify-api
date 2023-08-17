@@ -28,7 +28,7 @@
 ### You need installed MongoDB, Python(3.11.3) version to run this. 🙌
 - ### Run the command in your terminal.
 
-        git clone https://github.com/clar1k/BlogifyAPI
+        git clone https://github.com/clar1k/blogify-api
 
 - ### Go to the new directory. When write in command line:
 
